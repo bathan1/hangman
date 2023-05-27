@@ -7,8 +7,10 @@ with open('hangman.txt', 'r') as file:
 
 # Preliminary game setup
 
-# Set up blank character strings
-blanks = "_ " * len(gameword)
+# Set up list of underscores
+underscores = ["_" for char in gameword]
+# Set up list of guessed letters
+guessed_chars = []
 # The total amount of lives
 lives = 6
 
@@ -95,8 +97,41 @@ hangman_dict = {
     0: hangman_gallows_0,
 }
 
-
+win = False
 print("Welcome to Hangman!")
-print(hangman_dict[6])
-print(blanks)
 # Set up Game Loop
+
+while lives > 0 and not win:
+    #Print gallows + blanks
+    print(hangman_dict[lives])
+    blanks = " ".join(underscores)
+    print(blanks)
+    print("Not in the word:", ",".join(guessed_chars))
+
+    user_guess = input("Guess a letter: ")
+
+    while len(user_guess) != 1: # Ensures the guess is just a letter
+        user_guess = input("Guess a letter: ")
+
+    # Control flow for after user inputs a letter to guess
+    if gameword.count(user_guess) > 0:
+        start_index = gameword.find(user_guess)
+        while start_index != -1:
+            underscores[start_index] = user_guess
+            start_index = gameword.find(user_guess, start_index + 1)
+    else:
+        guessed_chars.append(user_guess)
+        print(user_guess, "is not in the word!")
+        lives = lives - 1
+    
+    # win/lose conditions
+    check_word = "".join(underscores)
+    if check_word == gameword:
+        blanks = " ".join(underscores)
+        print(hangman_dict[lives])
+        print(blanks)
+        print("You correctly guessed the word " + gameword + "!")
+        win = True
+    if lives == 0:
+        print(hangman_dict[0])
+        print("You lost :( The word was:", gameword)
